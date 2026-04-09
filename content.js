@@ -1,53 +1,60 @@
-// content.js
+console.log("🚀 Web Çevirici: Sistem başlatıldı.");
 
-// 1. Gözlemci (Observer) Ayarları
-const observerOptions = {
-    root: null, // Viewport'u baz al
-    threshold: 0.5 // Resmin %50'si göründüğünde tetikle
-};
+let worker = null;
 
-// 2. Resim göründüğünde ne yapılacağını belirleyen fonksiyon
-const handleIntersection = (entries, observer) => {
+async function initOCR() {
+    try {
+        worker = await Tesseract.createWorker('eng');
+        console.log("✅ OCR Motoru Hazır!");
+    } catch (e) {
+        console.error("❌ OCR Başlatma Hatası:", e);
+    }
+}
+initOCR();
+
+async function recognizeText(img) {
+    if (!worker) return;
+
+    try {
+        // --- GÜNCELLEME: CORS ENGELİNİ AŞMAK İÇİN CANVAS KULLANIMI ---
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        
+        // Resmi 'data url' formatına çeviriyoruz (Tesseract bunu daha kolay okur)
+        const dataUrl = canvas.toDataURL('image/png');
+        
+        console.log("🔍 Resim okunuyor...");
+        const { data: { text } } = await worker.recognize(dataUrl);
+
+        if (text.trim().length > 0) {
+            img.style.border = "5px solid green"; // Başarılı!
+            console.log("%c [OKUNAN METİN]: ", "background: green; color: white; padding: 2px;", text);
+        } else {
+            img.style.border = "5px solid gray"; // Yazı yok
+            console.log("⚪ Bu resimde yazı bulunamadı.");
+        }
+    } catch (err) {
+        img.style.border = "5px solid yellow"; // Güvenlik engeli
+        console.warn("⚠️ Resim okuma başarısız (Güvenlik/CORS):", img.src);
+    }
+}
+
+// Görsel gözlemleme ve tarama kodların aynı kalsın...
+const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const img = entry.target;
-            
-            // Eğer resim zaten çevrildiyse tekrar uğraşma
-            if (img.dataset.translated === "true") return;
-
-            console.log("Çeviri için resim yakalandı:", img.src);
-            
-            // Burada OCR ve Çeviri aşamasına geçilecek
-            startTranslationProcess(img);
-            
-            // İşlem tamamlanınca işaretle
-            img.dataset.translated = "true";
+        if (entry.isIntersecting && !entry.target.dataset.processed) {
+            entry.target.dataset.processed = "true";
+            recognizeText(entry.target);
         }
     });
-};
+}, { threshold: 0.1 });
 
-// 3. Gözlemciyi başlat
-const observer = new IntersectionObserver(handleIntersection, observerOptions);
-
-// 4. Sayfadaki tüm resimleri (img etiketlerini) takip et
-function scanImages() {
-    const images = document.querySelectorAll('img');
-    images.forEach(img => {
-        // Çok küçük ikonları veya reklamları filtrelemek için boyut kontrolü
-        if (img.width > 200 && img.height > 200) {
-            observer.observe(img);
-        }
+function scan() {
+    document.querySelectorAll('img').forEach(img => {
+        if (img.width > 200 && img.height > 200) observer.observe(img);
     });
 }
-
-// Sayfa yüklendiğinde ve scroll yapıldığında tara
-scanImages();
-
-// Dinamik yüklenen resimler için (Sonsuz kaydırma olan siteler)
-const domObserver = new MutationObserver(() => scanImages());
-domObserver.observe(document.body, { childList: true, subtree: true });
-
-function startTranslationProcess(img) {
-    // Gelecek aşamada buraya OCR kodlarını ekleyeceğiz
-    console.log("OCR Modülü bekleniyor...");
-}
+setInterval(scan, 2000); // 2 saniyede bir yeni resimleri tara
