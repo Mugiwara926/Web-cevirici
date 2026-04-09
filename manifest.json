@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Web Çevirici (Manga/Manhwa)",
+  "version": "1.0",
+  "description": "Sayfadaki İngilizce manga panellerini otomatik bulur ve çevirir.",
+  "permissions": ["storage", "activeTab"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
