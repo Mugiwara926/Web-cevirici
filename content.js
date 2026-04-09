@@ -130,77 +130,57 @@ function placeOverlay(img, bbox, text, lineCount) {
     const scaleX = rect.width / img.naturalWidth;
     const scaleY = rect.height / img.naturalHeight;
 
-    // 1. Kutunun Temel Boyutlarını ve Konumunu Hesapla
     const boxLeft = rect.left + window.pageXOffset + (bbox.x0 * scaleX);
     const boxTop = rect.top + window.pageYOffset + (bbox.y0 * scaleY);
     const boxWidth = (bbox.x1 - bbox.x0) * scaleX;
     const boxHeight = (bbox.y1 - bbox.y0) * scaleY;
 
-    // 2. Overlay Div'ini Oluştur
     const div = document.createElement('div');
+    div.className = 'manga-translator-overlay';
     div.style = `
         position: absolute;
         left: ${boxLeft}px;
         top: ${boxTop}px;
         width: ${boxWidth}px;
         height: ${boxHeight}px;
-        
-        /* GÖRSEL İYİLEŞTİRMELER */
-        background: rgba(255, 255, 255, 0.9); /* Saf beyaz yerine hafif şeffaf */
-        color: #000; /* Tam siyah */
-        font-family: 'CC Wild Words', 'Anime Ace', 'Segoe UI', sans-serif; /* Manga fontları */
+        background: rgba(255, 255, 255, 0.95);
+        color: #000;
+        font-family: 'Arial Black', sans-serif;
         font-weight: bold;
         line-height: 1.1;
-        
-        /* HİZALAMA */
         display: flex;
-        align-items: center; /* Dikeyde ortala */
-        justify-content: center; /* Yatayda ortala */
+        align-items: center;
+        justify-content: center;
         text-align: center;
-        
-        /* DÜZEN VE TAŞMA DENETİMİ */
         z-index: 2147483647;
-        padding: 4px; /* Metin kenarlara yapışmasın */
-        box-sizing: border-box; /* Padding'i genişliğe dahil et */
-        word-wrap: break-word; /* Uzun kelimeleri böl */
-        overflow: hidden; /* Taşmayı gizle (amaç aşağıda sığdırmak) */
-        
-        /* ESTETİK */
-        border-radius: 6px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        padding: 2px;
+        box-sizing: border-box;
+        word-wrap: break-word;
+        overflow: hidden;
+        border-radius: 4px;
+        pointer-events: none;
     `;
     
-    // 3. İçerik Span'ını Oluştur (Boyut ölçümü için gerekli)
+    // Metni içine koyacağımız yardımcı element
     const span = document.createElement('span');
     span.innerText = text;
     div.appendChild(span);
     document.body.appendChild(div);
 
-    // 4. KRİTİK ÇÖZÜM: Dinamik Yazı Boyutu Sığdırma (Auto-Shrink)
-    // Maksimum ve minimum yazı boyutlarını belirle
-    let maxFontSize = 20; 
-    let minFontSize = 9;
-    let currentFontSize = maxFontSize;
+    // --- KRİTİK AYAR: OTOMATİK SIĞDIRMA ---
+    let fontSize = 24; // Başlangıç boyutu (Maksimum)
+    const minSize = 8;  // İnebileceği en küçük boyut
 
-    // Metin kutuya sığana veya minimum boyuta ulaşana kadar döngüyü çalıştır
-    while (currentFontSize > minFontSize) {
-        span.style.fontSize = currentFontSize + 'px';
+    // Metin kutuya sığana kadar fontu küçült
+    while (fontSize > minSize) {
+        span.style.fontSize = fontSize + 'px';
         
-        // Span'ın (metnin) boyutları, div'in (kutunun) boyutlarını aşıyor mu?
-        if (span.offsetWidth <= div.clientWidth - 8 && span.offsetHeight <= div.clientHeight - 8) {
-            // Sığdı! Döngüden çık.
+        // Eğer metnin genişliği veya yüksekliği kutuyu aşıyorsa küçültmeye devam et
+        if (span.offsetWidth <= (boxWidth - 4) && span.offsetHeight <= (boxHeight - 4)) {
             break; 
         }
-        
-        // Sığmadı, yazı boyutunu küçült ve tekrar dene.
-        currentFontSize -= 0.5; // Daha hassas ayar için 0.5 azaltıyoruz.
+        fontSize -= 0.5;
     }
     
-    // Eğer minimum boyutta bile sığmıyorsa, kelime bölmeyi (hyphens) açabiliriz.
-    if (currentFontSize <= minFontSize) {
-        div.style.hyphens = 'auto';
-        div.style.webkitHyphens = 'auto';
-    }
-
     return div;
 }
