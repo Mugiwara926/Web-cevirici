@@ -2,14 +2,19 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 15px; width: 220px; text-align: center; background: #f8f9fa; margin: 0; }
+        h3 { margin-top: 0; color: #333; font-size: 16px; }
+        button { padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 6px; width: 100%; font-weight: bold; transition: background 0.2s; }
+        button:hover { background: #0056b3; }
+        #status { margin-top: 12px; font-size: 12px; color: #666; min-height: 15px; }
+    </style>
 </head>
 <body>
     <h3>Manga Çevirici</h3>
-    <button id="start-ocr">Resmi Tara ve Çevir</button>
-    <div id="status">Hazır.</div>
+    <button id="start-ocr">Sayfadaki Resmi Çevir</button>
+    <div id="status">Hazır. Bekleniyor...</div>
     
-    <script src="lib/tesseract/tesseract.min.js"></script>
     <script src="popup.js"></script>
 </body>
 </html>

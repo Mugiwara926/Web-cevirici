@@ -1,5 +1,4 @@
 chrome.runtime.onInstalled.addListener(() => {
-  // Sadece resimler üzerinde çıkan sağ tık menüsü
   chrome.contextMenus.create({ 
     id: "translate-this-image", 
     title: "Bu Resmi Çevir", 
@@ -44,7 +43,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "translate-this-image") {
-    // Content script'e "bu resmi işle" emri gönderiyoruz
     chrome.tabs.sendMessage(tab.id, { action: "manual_process", url: info.srcUrl });
   }
 });
