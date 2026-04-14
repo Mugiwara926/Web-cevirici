@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Manga Translator Ultimate",
-  "version": "6.0",
+  "version": "7.0",
   "permissions": [
     "activeTab",
     "scripting",
@@ -9,7 +9,7 @@
   ],
   "host_permissions": [
     "<all_urls>",
-    "https://translate.googleapis.com/*"
+    "http://127.0.0.1:8000/*" 
   ],
   "background": {
     "service_worker": "background.js"
@@ -18,16 +18,9 @@
     {
       "matches": ["<all_urls>"],
       "js": [
-        "lib/tesseract/tesseract.min.js",
         "content.js"
       ],
       "run_at": "document_idle"
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": ["lib/tesseract/*"],
-      "matches": ["<all_urls>"]
     }
   ]
 }
