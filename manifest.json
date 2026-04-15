@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Manga Translator Ultimate",
-  "version": "7.0",
+  "version": "8.0",
   "permissions": [
     "activeTab",
     "scripting",
@@ -9,17 +9,24 @@
   ],
   "host_permissions": [
     "<all_urls>",
-    "http://127.0.0.1:8000/*" 
+    "http://127.0.0.1:8000/*"
   ],
+  "commands": {
+    "translate-screen": {
+      "suggested_key": {
+        "default": "Alt+Q",
+        "mac": "Alt+Q"
+      },
+      "description": "Tüm ekranı çevir"
+    }
+  },
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": [
-        "content.js"
-      ],
+      "js": ["content.js"],
       "run_at": "document_idle"
     }
   ]

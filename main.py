@@ -84,7 +84,17 @@ async def process_image(request: TranslationRequest):
             "detected_balloons": len(ocr_results),
             "ocr_results": ocr_results
         }
+    
+
         
     except Exception as e:
         print(f"Hata detayı: {str(e)}")
-        raise HTTPException(status_code=500, detail="Görsel işlenirken sunucu hatası oluştu.")
+        raise HTTPException(status_code=500, detail="Görsel işlenirken sunucu hatası oluştu.");
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)
+
+    
+    
